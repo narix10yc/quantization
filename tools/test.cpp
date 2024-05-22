@@ -1,33 +1,28 @@
 #include "types.h"
 
 int main() {
-    // using real_ty = float;
-    using real_ty = quantized<14>;
+    using real_ty = quantized<15>;
+    using real_ty_bl = double;
     using Matrix = SquareComplexMatrix<real_ty>;
+    using Matrix_bl = SquareComplexMatrix<real_ty_bl>;
 
-    auto hGate = Matrix::H();
-    hGate.print(std::cerr);
+    Statevector<real_ty> sv(12, true);
+    Statevector<real_ty_bl> sv_bl(12, true);
 
-    auto sv = Statevector<real_ty>(3, true);
-    sv.randomize();
-    sv.print(std::cerr);
-    
-    std::cerr << "norm=" << sv.norm() << "\n";
+    sv_bl.randomize();
+    sv.copyValuesFrom(sv_bl);
 
-    sv.applySingleQubit(hGate, 0);
-    // sv.applySingleQubit(hGate, 1);
-    // sv.applySingleQubit(hGate, 2);
+    sv.applyH(0);
+    sv_bl.applyH(0);
 
-    sv.print(std::cerr);
-    std::cerr << "\n";
+    sv.applyCX(1, 0);
+    sv_bl.applyCX(1, 0);
 
-    sv.applyTwoQubit(Matrix::CX(), 1, 0);
-    sv.applyTwoQubit(Matrix::CZ(), 1, 2);
-
+    sv_bl.print(std::cerr);
     sv.print(std::cerr);
 
 
-
+    std::cerr << "norm = " << sv.norm() << "\n";
 
 
     return 0;

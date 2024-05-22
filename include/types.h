@@ -336,6 +336,14 @@ public:
 
     Statevector& operator=(Statevector&&) = delete;
 
+    template<typename another_real_ty>
+    void copyValuesFrom(Statevector<another_real_ty> other) {
+        for (size_t i = 0; i < N; i++) {
+            data[i].real = static_cast<double>(other.data[i].real);
+            data[i].imag = static_cast<double>(other.data[i].imag);
+        }
+    }
+
     double normSquared() const {
         double s = 0;
         for (size_t i = 0; i < N; i++)
@@ -434,13 +442,50 @@ public:
         }
     }
 
+    void applyX(unsigned k) {
+        return applySingleQubit(SquareComplexMatrix<real_ty>::X(), k);
+    }
+
+    void applyY(unsigned k) {
+        return applySingleQubit(SquareComplexMatrix<real_ty>::Y(), k);
+    }
+
+    void applyZ(unsigned k) {
+        return applySingleQubit(SquareComplexMatrix<real_ty>::Z(), k);
+    }
+
+    void applyH(unsigned k) {
+        return applySingleQubit(SquareComplexMatrix<real_ty>::H(), k);
+    }
+
+    void applyP(unsigned k, double phi) {
+        return applySingleQubit(SquareComplexMatrix<real_ty>::P(phi), k);
+    }
+
+    void applyU3(unsigned k, double theta, double phi, double lambd) {
+        return applySingleQubit(
+            SquareComplexMatrix<real_ty>::U3(theta, phi, lambd), k);
+    }
+
+    void applyCX(unsigned k, unsigned l) {
+        return applyTwoQubit(SquareComplexMatrix<real_ty>::CX(), k, l);
+    }
+
+    void applyCZ(unsigned k, unsigned l) {
+        return applyTwoQubit(SquareComplexMatrix<real_ty>::CZ(), k, l);
+    }
+
+    void applyCP(unsigned k, unsigned l, double phi) {
+        return applyTwoQubit(SquareComplexMatrix<real_ty>::CP(phi), k, l);
+    }
+
     void print(std::ostream& os) const {
         if (N > 32) {
             const char* cyan = "\033[36m";
             const char* bold = "\033[1m";
             const char* reset = "\033[0m";
             os << bold << cyan << "Warning: " << reset << "statevector has "
-                "more than 5 qubits, only the first 32 entries are shown.\n";
+                "more than 5 qubits, only the first 32 amplitudes are shown.\n";
         }
         for (size_t i = 0; i < ((N > 32) ? 32 : N); i++) {
             if (N >= 10 && i < 10)
